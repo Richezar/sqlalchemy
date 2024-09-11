@@ -14,7 +14,7 @@ class Book(Base):
     __tablename__ = 'book'
 
     id = sq.Column(sq.Integer, primary_key=True)
-    title = sq.Column(sq.String(length=60), nullable=False, unique=True)
+    title = sq.Column(sq.String(length=40), nullable=False, unique=True)
     id_publisher = sq.Column(sq.Integer, sq.ForeignKey('publisher.id'), nullable=False)
 
     publisher = relationship(Publisher, backref='books')

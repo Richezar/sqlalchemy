@@ -25,11 +25,26 @@ for record in data:
     session.add(model(id=record.get('pk'), **record.get('fields')))
 session.commit()
 
-publisher_name = input()
-
-result = session.query(Book, Shop, Sale, Sale.date_sale).filter(Publisher.name == publisher_name).filter(Publisher.id == Book.id_publisher).filter(Book.id == Stock.id_book).filter(Stock.id_shop == Shop.id).filter(Stock.id == Sale.id_stock).all()
-for r in result:
-    print(f'{r[0]} | {r[1]} | {r[2]} | {r[3]}')
-
+def get_shops(search):
+    if search.isnumeric():
+        results = session.query(Book.title, Shop.name, Sale.price, Sale.date_sale) \
+            .join(Publisher, Publisher.id == Book.id_publisher) \
+            .join(Stock, Stock.id_book == Book.id) \
+            .join(Shop, Shop.id == Stock.id_shop) \
+            .join(Sale, Sale.id_stock == Stock.id) \
+            .filter(Publisher.id == search).all()
+    else:
+        results = session.query(Book.title, Shop.name, Sale.price, Sale.date_sale) \
+            .join(Publisher, Publisher.id == Book.id_publisher) \
+            .join(Stock, Stock.id_book == Book.id) \
+            .join(Shop, Shop.id == Stock.id_shop) \
+            .join(Sale, Sale.id_stock == Stock.id) \
+            .filter(Publisher.name == search).all()
+    for book, shop, price, date in results:
+        print(f'{book: <40} | {shop: <10} | {price: <10} | {date.strftime("%d-%m-%Y")}')
 
 session.close()
+
+if __name__ == '__main__':
+    search = input('Введите идентификатор или имя автора: ')
+    get_shops(search)
